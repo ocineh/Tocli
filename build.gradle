@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group 'me.hocine'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'info.picocli:picocli:4.6.2'
+}
