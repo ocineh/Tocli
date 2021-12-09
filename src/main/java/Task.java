@@ -66,6 +66,11 @@ public class Task {
         this.done = false;
     }
 
+    @Override
+    public String toString() {
+        return (done ? "[X] " : "[ ] ") + id + ": " + title;
+    }
+
     public static class Bean {
         private Integer id;
         private String title;
