@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,7 @@ public class Task {
             try {
                 Reader reader = new FileReader(".tasks.csv");
                 tasks = new CsvToBeanBuilder<Bean>(reader).withQuoteChar('"').withSeparator(';').withType(Task.Bean.class).build().parse().stream().map(Task.Bean::build).collect(Collectors.toList());
-            } catch(Exception ignore) {}
+            } catch(Exception ignore) { tasks = new LinkedList<>(); }
         }
 
         public static void save() {
