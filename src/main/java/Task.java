@@ -1,9 +1,22 @@
+import com.opencsv.bean.CsvDate;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Task {
     private static List<Task> tasks;
     private static Integer count = 0;
+
+    static {Task.Bean.load();}
+
     private final Integer id;
     private final String title;
     private final Date added;
@@ -51,5 +64,58 @@ public class Task {
 
     public void undone() {
         this.done = false;
+    }
+
+    public static class Bean {
+        private Integer id;
+        private String title;
+        @CsvDate(writeFormat = "dd-MM-yyyy hh:mm:ss")
+        private Date added;
+        private boolean done;
+
+        public Bean() {}
+
+        public Bean(Task task) {
+            id = task.getId();
+            title = task.getTitle();
+            added = task.getAdded();
+            done = task.isDone();
+        }
+
+        private static void load() {
+            try {
+                Reader reader = new FileReader(".tasks.csv");
+                tasks = new CsvToBeanBuilder<Bean>(reader).withQuoteChar('"').withSeparator(';').withType(Task.Bean.class).build().parse().stream().map(Task.Bean::build).collect(Collectors.toList());
+            } catch(Exception ignore) {}
+        }
+
+        private static void save() {
+            try {
+                Writer writer = new FileWriter(".tasks.csv");
+                StatefulBeanToCsv<Bean> beanToCsv = new StatefulBeanToCsvBuilder<Bean>(writer).withQuotechar('"').withSeparator(';').build();
+                beanToCsv.write(tasks.stream().map(Task.Bean::new).collect(Collectors.toList()));
+                writer.close();
+            } catch(Exception ignore) {}
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public void setAdded(Date added) {
+            this.added = added;
+        }
+
+        public void setDone(boolean done) {
+            this.done = done;
+        }
+
+        public Task build() {
+            return new Task(id, title, added, done);
+        }
     }
 }
