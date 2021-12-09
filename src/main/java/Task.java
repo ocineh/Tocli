@@ -19,8 +19,8 @@ public class Task {
     static {Task.Bean.load();}
 
     private final Integer id;
-    private String title;
     private final Date added;
+    private String title;
     private boolean done;
 
     public Task(Integer id, String title, Date added, boolean done) {
@@ -43,16 +43,16 @@ public class Task {
         return tasks;
     }
 
-    public static void addTask(Task task){
+    public static void addTask(Task task) {
         tasks.add(task);
     }
 
-    public static boolean deleteTask(int id){
+    public static boolean deleteTask(int id) {
         return tasks.removeIf(task -> task.getId() == id);
     }
 
-    public static Task getTaskById(int id){
-        for(Task task: tasks) if(task.id == id) return task;
+    public static Task getTaskById(int id) {
+        for(Task task : tasks) if(task.id == id) return task;
         return null;
     }
 
@@ -109,7 +109,7 @@ public class Task {
             try {
                 Reader reader = new FileReader(".tasks.csv");
                 tasks = new CsvToBeanBuilder<Bean>(reader).withQuoteChar('"').withSeparator(';').withType(Task.Bean.class).build().parse().stream().map(Task.Bean::build).collect(Collectors.toList());
-            } catch(Exception ignore) { tasks = new LinkedList<>(); }
+            } catch(Exception ignore) {tasks = new LinkedList<>();}
         }
 
         public static void save() {
