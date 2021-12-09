@@ -11,4 +11,5 @@ repositories {
 
 dependencies {
     implementation 'info.picocli:picocli:4.6.2'
+    implementation 'com.opencsv:opencsv:+'
 }
