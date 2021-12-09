@@ -44,7 +44,6 @@ public class Task {
 
     public static void addTask(Task task){
         tasks.add(task);
-        Bean.save();
     }
 
     public static boolean deleteTask(int id){
@@ -112,7 +111,7 @@ public class Task {
             } catch(Exception ignore) {}
         }
 
-        private static void save() {
+        public static void save() {
             try {
                 Writer writer = new FileWriter(".tasks.csv");
                 StatefulBeanToCsv<Bean> beanToCsv = new StatefulBeanToCsvBuilder<Bean>(writer).withQuotechar('"').withSeparator(';').build();

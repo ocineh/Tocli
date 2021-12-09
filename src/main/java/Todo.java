@@ -20,6 +20,7 @@ public class Todo implements Callable<Integer> {
     @Command(name = "add")
     public void add(@Parameters String title) {
         Task.addTask(new Task(title));
+        Task.Bean.save();
     }
 
     @Command(name = "update")
@@ -29,11 +30,13 @@ public class Todo implements Callable<Integer> {
         if(title == null || title.isEmpty() || title.isBlank())
             throw new ParameterException(spec.commandLine(), "The new task title cannot be empty or contain only spaces.");
         task.setTitle(title);
+        Task.Bean.save();
     }
 
     @Command(name = "delete")
     public void delete(@Parameters int id) {
         if(!Task.deleteTask(id)) throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        Task.Bean.save();
     }
 
     @Command(name = "done")
@@ -41,6 +44,7 @@ public class Todo implements Callable<Integer> {
         for(Task task : Task.getTasks()) {
             if(task.getId() == id) {
                 task.done();
+                Task.Bean.save();
                 return;
             }
         }
@@ -52,6 +56,7 @@ public class Todo implements Callable<Integer> {
         for(Task task : Task.getTasks()) {
             if(task.getId() == id) {
                 task.undone();
+                Task.Bean.save();
                 return;
             }
         }
