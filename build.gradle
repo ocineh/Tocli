@@ -3,10 +3,7 @@ plugins {
     id 'application'
 }
 
-apply plugin: 'application'
-application {
-    mainClassName("Todo")
-}
+application.getMainClass().set("Todo")
 
 group 'me.hocine'
 version '0.0.1'
