@@ -42,6 +42,11 @@ public class Task {
         return tasks;
     }
 
+    public static void addTask(Task task){
+        tasks.add(task);
+        Bean.save();
+    }
+
     public Integer getId() {
         return id;
     }

@@ -1,5 +1,6 @@
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
 import java.util.concurrent.Callable;
 
@@ -15,7 +16,8 @@ public class Todo implements Callable<Integer> {
     }
 
     @Command(name = "add")
-    public void add() {
+    public void add(@Parameters String title) {
+        Task.addTask(new Task(title));
     }
 
     @Command(name = "update")
