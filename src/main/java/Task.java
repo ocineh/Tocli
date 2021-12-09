@@ -47,6 +47,10 @@ public class Task {
         Bean.save();
     }
 
+    public static boolean deleteTask(int id){
+        return tasks.removeIf(task -> task.getId() == id);
+    }
+
     public Integer getId() {
         return id;
     }

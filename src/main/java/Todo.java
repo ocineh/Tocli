@@ -1,9 +1,6 @@
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.Parameters;
-import picocli.CommandLine.Spec;
+import picocli.CommandLine.*;
 
 import java.util.concurrent.Callable;
 
@@ -30,7 +27,8 @@ public class Todo implements Callable<Integer> {
     }
 
     @Command(name = "delete")
-    public void delete() {
+    public void delete(@Parameters int id) {
+        if(!Task.deleteTask(id)) throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
 
     @Command(name = "done")
