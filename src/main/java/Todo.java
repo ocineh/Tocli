@@ -23,7 +23,12 @@ public class Todo implements Callable<Integer> {
     }
 
     @Command(name = "update")
-    public void update() {
+    public void update(@Parameters int id, @Parameters String title) {
+        Task task = Task.getTaskById(id);
+        if(task == null) throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        if(title == null || title.isEmpty() || title.isBlank())
+            throw new ParameterException(spec.commandLine(), "The new task title cannot be empty or contain only spaces.");
+        task.setTitle(title);
     }
 
     @Command(name = "delete")

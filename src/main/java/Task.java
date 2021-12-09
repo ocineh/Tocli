@@ -18,7 +18,7 @@ public class Task {
     static {Task.Bean.load();}
 
     private final Integer id;
-    private final String title;
+    private String title;
     private final Date added;
     private boolean done;
 
@@ -51,12 +51,21 @@ public class Task {
         return tasks.removeIf(task -> task.getId() == id);
     }
 
+    public static Task getTaskById(int id){
+        for(Task task: tasks) if(task.id == id) return task;
+        return null;
+    }
+
     public Integer getId() {
         return id;
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public Date getAdded() {
