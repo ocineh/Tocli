@@ -4,7 +4,7 @@ import picocli.CommandLine.*;
 
 import java.util.concurrent.Callable;
 
-@Command(name = "todonisator", mixinStandardHelpOptions = true, version = "todonisator 0.0.1")
+@Command(name = "todonisator", mixinStandardHelpOptions = true, version = "todonisator 0.1.0")
 public class Todo implements Callable<Integer> {
     @Spec CommandSpec spec;
 
