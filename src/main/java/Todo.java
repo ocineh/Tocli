@@ -65,6 +65,7 @@ public class Todo implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
+        list();
         return 0;
     }
 }
