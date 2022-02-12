@@ -23,8 +23,8 @@ public class Todo implements Callable<Integer> {
         Task.Bean.save();
     }
 
-    @Command(name = "update")
-    public void update(@Parameters int id, @Parameters String title) {
+    @Command(name = "rename")
+    public void rename(@Parameters int id, @Parameters String title) {
         Task task = Task.getTaskById(id);
         if(task == null) throw new ParameterException(spec.commandLine(), "No task exists with this id.");
         if(title == null || title.isEmpty() || title.isBlank())
