@@ -1,6 +1,9 @@
 import picocli.CommandLine;
+import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.*;
+import picocli.CommandLine.ParameterException;
+import picocli.CommandLine.Parameters;
+import picocli.CommandLine.Spec;
 
 import java.util.concurrent.Callable;
 
@@ -26,22 +29,31 @@ public class Todo implements Callable<Integer> {
     @Command(name = "rename")
     public void rename(@Parameters int id, @Parameters String title) {
         Task task = Task.getTaskById(id);
-        if(task == null) throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        if(task == null) throw new ParameterException(
+                spec.commandLine(),
+                "No task exists with this id."
+        );
         if(title == null || title.isEmpty() || title.isBlank())
-            throw new ParameterException(spec.commandLine(), "The new task title cannot be empty or contain only spaces.");
+            throw new ParameterException(
+                    spec.commandLine(),
+                    "The new task title cannot be empty or contain only spaces."
+            );
         task.setTitle(title);
         Task.Bean.save();
     }
 
     @Command(name = "delete")
     public void delete(@Parameters int id) {
-        if(!Task.deleteTask(id)) throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        if(!Task.deleteTask(id)) throw new ParameterException(
+                spec.commandLine(),
+                "No task exists with this id."
+        );
         Task.Bean.save();
     }
 
     @Command(name = "done")
     public void done(@Parameters int id) throws ParameterException {
-        for(Task task : Task.getTasks()) {
+        for(Task task: Task.getTasks()) {
             if(task.getId() == id) {
                 task.done();
                 Task.Bean.save();
@@ -53,7 +65,7 @@ public class Todo implements Callable<Integer> {
 
     @Command(name = "undone")
     public void undone(@Parameters int id) throws ParameterException {
-        for(Task task : Task.getTasks()) {
+        for(Task task: Task.getTasks()) {
             if(task.getId() == id) {
                 task.undone();
                 Task.Bean.save();

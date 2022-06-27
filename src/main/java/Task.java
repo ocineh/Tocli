@@ -52,7 +52,7 @@ public class Task {
     }
 
     public static Task getTaskById(int id) {
-        for(Task task : tasks) if(task.id == id) return task;
+        for(Task task: tasks) if(task.id == id) return task;
         return null;
     }
 
@@ -92,8 +92,7 @@ public class Task {
     public static class Bean {
         private Integer id;
         private String title;
-        @CsvDate(writeFormat = "dd-MM-yyyy hh:mm:ss")
-        private Date added;
+        @CsvDate(writeFormat = "dd-MM-yyyy hh:mm:ss") private Date added;
         private boolean done;
 
         public Bean() {}
@@ -108,14 +107,25 @@ public class Task {
         private static void load() {
             try {
                 Reader reader = new FileReader(".tasks.csv");
-                tasks = new CsvToBeanBuilder<Bean>(reader).withQuoteChar('"').withSeparator(';').withType(Task.Bean.class).build().parse().stream().map(Task.Bean::build).collect(Collectors.toList());
+                tasks = new CsvToBeanBuilder<Bean>(reader)
+                        .withQuoteChar('"')
+                        .withSeparator(';')
+                        .withType(Task.Bean.class)
+                        .build()
+                        .parse()
+                        .stream()
+                        .map(Task.Bean::build)
+                        .collect(Collectors.toList());
             } catch(Exception ignore) {tasks = new LinkedList<>();}
         }
 
         public static void save() {
             try {
                 Writer writer = new FileWriter(".tasks.csv");
-                StatefulBeanToCsv<Bean> beanToCsv = new StatefulBeanToCsvBuilder<Bean>(writer).withQuotechar('"').withSeparator(';').build();
+                StatefulBeanToCsv<Bean> beanToCsv = new StatefulBeanToCsvBuilder<Bean>(writer)
+                        .withQuotechar('"')
+                        .withSeparator(';')
+                        .build();
                 beanToCsv.write(tasks.stream().map(Task.Bean::new).collect(Collectors.toList()));
                 writer.close();
             } catch(Exception ignore) {}
