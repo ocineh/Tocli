@@ -13,6 +13,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'info.picocli:picocli:4.6.2'
-    implementation 'com.opencsv:opencsv:5.5.2'
+    implementation 'info.picocli:picocli:4.6.3'
+    implementation 'com.opencsv:opencsv:5.6'
 }
