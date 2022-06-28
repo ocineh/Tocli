@@ -6,7 +6,7 @@ plugins {
 application.getMainClass().set("Todo")
 
 group 'me.hocine'
-version '0.1.0'
+version '0.1.1'
 
 repositories {
     mavenCentral()
@@ -14,5 +14,4 @@ repositories {
 
 dependencies {
     implementation 'info.picocli:picocli:4.6.3'
-    implementation 'com.opencsv:opencsv:5.6'
 }

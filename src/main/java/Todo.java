@@ -5,11 +5,18 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.0")
+@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.1")
 public class Todo implements Callable<Integer> {
+    private static final Path data = Path.of(".tasks");
+    private final TaskList tasks = new TaskList();
     @Spec CommandSpec spec;
+
+    {
+        tasks.load(data);
+    }
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new Todo()).execute(args));
@@ -17,18 +24,18 @@ public class Todo implements Callable<Integer> {
 
     @Command(name = "list")
     public void list() {
-        Task.getTasks().forEach(System.out::println);
+        tasks.forEach(System.out::println);
     }
 
     @Command(name = "add")
     public void add(@Parameters String title) {
-        Task.addTask(new Task(title));
-        Task.Bean.save();
+        tasks.add(title);
+        tasks.save(data);
     }
 
     @Command(name = "rename")
     public void rename(@Parameters int id, @Parameters String title) {
-        Task task = Task.getTaskById(id);
+        Task task = tasks.get(id);
         if(task == null) throw new ParameterException(
                 spec.commandLine(),
                 "No task exists with this id."
@@ -39,24 +46,24 @@ public class Todo implements Callable<Integer> {
                     "The new task title cannot be empty or contain only spaces."
             );
         task.setTitle(title);
-        Task.Bean.save();
+        tasks.save(data);
     }
 
     @Command(name = "delete")
     public void delete(@Parameters int id) {
-        if(!Task.deleteTask(id)) throw new ParameterException(
+        if(!tasks.remove(id)) throw new ParameterException(
                 spec.commandLine(),
                 "No task exists with this id."
         );
-        Task.Bean.save();
+        tasks.save(data);
     }
 
     @Command(name = "done")
     public void done(@Parameters int id) throws ParameterException {
-        for(Task task: Task.getTasks()) {
+        for(Task task: tasks) {
             if(task.getId() == id) {
                 task.done();
-                Task.Bean.save();
+                tasks.save(data);
                 return;
             }
         }
@@ -65,10 +72,10 @@ public class Todo implements Callable<Integer> {
 
     @Command(name = "undone")
     public void undone(@Parameters int id) throws ParameterException {
-        for(Task task: Task.getTasks()) {
+        for(Task task: tasks) {
             if(task.getId() == id) {
                 task.undone();
-                Task.Bean.save();
+                tasks.save(data);
                 return;
             }
         }
