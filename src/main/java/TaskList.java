@@ -16,7 +16,7 @@ public class TaskList implements Iterable<Task>, Serialize {
     }
 
     public void add(String title) {
-        tasks.add(new Task(tasks.size(), title));
+        tasks.add(new Task(title));
     }
 
     public void remove(Task task) {
@@ -24,12 +24,20 @@ public class TaskList implements Iterable<Task>, Serialize {
     }
 
     public boolean remove(int id) {
-        return tasks.removeIf(task -> task.getId() == id);
+        try {
+            tasks.remove(id);
+            return true;
+        } catch(IndexOutOfBoundsException e) {
+            return false;
+        }
     }
 
     public Task get(int id) {
-        for(Task task: tasks) if(task.getId() == id) return task;
-        return null;
+        try {
+            return tasks.get(id);
+        } catch(IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     public void load(Path path) {
@@ -49,5 +57,25 @@ public class TaskList implements Iterable<Task>, Serialize {
     public Iterator<Task> iterator() {
         if(tasks == null) return null;
         return tasks.iterator();
+    }
+
+    @Override
+    public String toString() {
+        int lengthMax = (int) (Math.log10(tasks.size()) + 1);
+        String format = "%" + lengthMax + "d";
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            sb.append(String.format(format, i))
+                    .append(": ")
+                    .append((task.isDone() ? "[X] " : "[ ] "))
+                    .append(task.getTitle())
+                    .append("\n");
+        }
+        return sb.toString();
+    }
+
+    public int size() {
+        return tasks.size();
     }
 }

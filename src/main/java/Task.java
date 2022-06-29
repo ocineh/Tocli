@@ -1,25 +1,18 @@
 import java.util.Date;
 
 public class Task implements Serialize {
-
-    private final Integer id;
     private final Date added;
     private String title;
     private boolean done;
 
-    public Task(Integer id, String title, Date added, boolean done) {
-        this.id = id;
+    public Task(String title, Date added, boolean done) {
         this.title = title;
         this.added = added;
         this.done = done;
     }
 
-    public Task(Integer id, String title) {
-        this(id, title, new Date(), false);
-    }
-
-    public Integer getId() {
-        return id;
+    public Task(String title) {
+        this(title, new Date(), false);
     }
 
     public String getTitle() {
@@ -48,6 +41,6 @@ public class Task implements Serialize {
 
     @Override
     public String toString() {
-        return (done ? "[X] " : "[ ] ") + id + ": " + title;
+        return (done ? "[X] " : "[ ] ") + ": " + title;
     }
 }

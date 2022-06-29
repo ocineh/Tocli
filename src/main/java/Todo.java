@@ -24,7 +24,7 @@ public class Todo implements Callable<Integer> {
 
     @Command(name = "list")
     public void list() {
-        tasks.forEach(System.out::println);
+        System.out.println(tasks);
     }
 
     @Command(name = "add")
@@ -60,26 +60,16 @@ public class Todo implements Callable<Integer> {
 
     @Command(name = "done")
     public void done(@Parameters int id) throws ParameterException {
-        for(Task task: tasks) {
-            if(task.getId() == id) {
-                task.done();
-                tasks.save(data);
-                return;
-            }
-        }
-        throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        Task task = tasks.get(id);
+        if(task != null) task.done();
+        else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
 
     @Command(name = "undone")
     public void undone(@Parameters int id) throws ParameterException {
-        for(Task task: tasks) {
-            if(task.getId() == id) {
-                task.undone();
-                tasks.save(data);
-                return;
-            }
-        }
-        throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        Task task = tasks.get(id);
+        if(task != null) task.undone();
+        else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
 
     @Override
