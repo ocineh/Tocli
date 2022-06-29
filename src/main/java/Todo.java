@@ -11,8 +11,7 @@ public class Todo implements Callable<Integer> {
     @Option(
             names = {"--file", "-f"},
             description = "Path to the todo file (default: ${DEFAULT-VALUE})"
-    )
-    private final Path data = Path.of(".tasks");
+    ) private final Path data = Path.of(".tasks");
     @Spec CommandSpec spec;
 
     {
@@ -23,19 +22,27 @@ public class Todo implements Callable<Integer> {
         System.exit(new CommandLine(new Todo()).execute(args));
     }
 
-    @Command(name = "list")
+    @Command(name = "list", description = "List all tasks", mixinStandardHelpOptions = true)
     public void list() {
         System.out.println(tasks);
     }
 
-    @Command(name = "add")
-    public void add(@Parameters String title) {
+    @Command(name = "add", description = "Add a new task", mixinStandardHelpOptions = true)
+    public void add(
+            @Parameters(paramLabel = "<TITLE>", description = "The title of the task") String title
+    ) {
         tasks.add(title);
         tasks.save(data);
     }
 
-    @Command(name = "rename")
-    public void rename(@Parameters int id, @Parameters String title) {
+    @Command(name = "rename", description = "Rename a task", mixinStandardHelpOptions = true)
+    public void rename(
+            @Parameters(paramLabel = "<ID>", description = "The ID of the task") int id,
+            @Parameters(
+                    paramLabel = "<TITLE>",
+                    description = "The new title of the task"
+            ) String title
+    ) {
         Task task = tasks.get(id);
         if(task == null) throw new ParameterException(
                 spec.commandLine(),
@@ -50,8 +57,10 @@ public class Todo implements Callable<Integer> {
         tasks.save(data);
     }
 
-    @Command(name = "delete")
-    public void delete(@Parameters int id) {
+    @Command(name = "delete", description = "Delete a task", mixinStandardHelpOptions = true)
+    public void delete(
+            @Parameters(paramLabel = "<ID>", description = "The ID of the task") int id
+    ) {
         if(!tasks.remove(id)) throw new ParameterException(
                 spec.commandLine(),
                 "No task exists with this id."
@@ -59,22 +68,26 @@ public class Todo implements Callable<Integer> {
         tasks.save(data);
     }
 
-    @Command(name = "done")
-    public void done(@Parameters int id) throws ParameterException {
+    @Command(name = "done", description = "Mark a task as done", mixinStandardHelpOptions = true)
+    public void done(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
+    throws ParameterException {
         Task task = tasks.get(id);
         if(task != null) task.done();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
 
-    @Command(name = "undone")
-    public void undone(@Parameters int id) throws ParameterException {
+    @Command(
+            name = "undone", description = "Mark a task as undone", mixinStandardHelpOptions = true
+    )
+    public void undone(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
+    throws ParameterException {
         Task task = tasks.get(id);
         if(task != null) task.undone();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         list();
         return 0;
     }
