@@ -1,17 +1,18 @@
 import picocli.CommandLine;
-import picocli.CommandLine.Command;
+import picocli.CommandLine.*;
 import picocli.CommandLine.Model.CommandSpec;
-import picocli.CommandLine.ParameterException;
-import picocli.CommandLine.Parameters;
-import picocli.CommandLine.Spec;
 
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 @Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.1")
 public class Todo implements Callable<Integer> {
-    private static final Path data = Path.of(".tasks");
     private final TaskList tasks = new TaskList();
+    @Option(
+            names = {"--file", "-f"},
+            description = "Path to the todo file (default: ${DEFAULT-VALUE})"
+    )
+    private final Path data = Path.of(".tasks");
     @Spec CommandSpec spec;
 
     {
