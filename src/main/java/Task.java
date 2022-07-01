@@ -7,7 +7,7 @@ public class Task implements Serialize {
 
     public Task(String title, Date added, boolean done) {
         this.title = title;
-        this.added = added;
+        this.added = added == null ? new Date() : added;
         this.done = done;
     }
 

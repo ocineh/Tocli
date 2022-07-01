@@ -7,7 +7,7 @@ import java.io.*;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.2")
+@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.3")
 public class Todo implements Callable<Integer> {
     private final TaskList tasks = new TaskList();
     @Option(
@@ -15,6 +15,11 @@ public class Todo implements Callable<Integer> {
             description = "Path to the todo file (default: ${DEFAULT-VALUE})"
     ) private final Path data = Path.of(".tasks");
     @Spec CommandSpec spec;
+    @Parameters(
+            paramLabel = "<TASK LIST NAME>",
+            description = "The name of the task list (default: ${DEFAULT-VALUE})",
+            defaultValue = "default"
+    ) private String taskListName;
 
     {
         tasks.load(data);
@@ -33,7 +38,7 @@ public class Todo implements Callable<Integer> {
     public void add(
             @Parameters(paramLabel = "<TITLE>", description = "The title of the task") String title
     ) {
-        tasks.add(title);
+        tasks.add(taskListName, title);
         tasks.save(data);
     }
 
@@ -45,7 +50,7 @@ public class Todo implements Callable<Integer> {
                     description = "The new title of the task"
             ) String title
     ) {
-        Task task = tasks.get(id);
+        Task task = tasks.get(taskListName, id);
         if(task == null) throw new ParameterException(
                 spec.commandLine(),
                 "No task exists with this id."
@@ -63,7 +68,7 @@ public class Todo implements Callable<Integer> {
     public void delete(
             @Parameters(paramLabel = "<ID>", description = "The ID of the task") int id
     ) {
-        if(!tasks.remove(id)) throw new ParameterException(
+        if(!tasks.remove(taskListName, id)) throw new ParameterException(
                 spec.commandLine(),
                 "No task exists with this id."
         );
@@ -73,7 +78,7 @@ public class Todo implements Callable<Integer> {
     @Command(name = "done", description = "Mark a task as done", mixinStandardHelpOptions = true)
     public void done(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
     throws ParameterException {
-        Task task = tasks.get(id);
+        Task task = tasks.get(taskListName, id);
         if(task != null) task.done();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
@@ -85,7 +90,7 @@ public class Todo implements Callable<Integer> {
     )
     public void undone(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
     throws ParameterException {
-        Task task = tasks.get(id);
+        Task task = tasks.get(taskListName, id);
         if(task != null) task.undone();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
     }
@@ -141,8 +146,7 @@ public class Todo implements Callable<Integer> {
     ) {
         try {
             JsonReader reader = new JsonReader(new FileReader(path.toFile()));
-            for(Task task: Serialize.fromJson(reader, TaskList.class))
-                tasks.add(task);
+            tasks.addAll(Serialize.fromJson(reader, TaskList.class));
         } catch(FileNotFoundException e) {
             throw new ParameterException(spec.commandLine(), "The input file does not exist.");
         } finally {

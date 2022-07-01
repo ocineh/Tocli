@@ -1,40 +1,39 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 public class TaskList implements Iterable<Task>, Serialize {
-    private LinkedList<Task> tasks;
+    private HashMap<String, LinkedList<Task>> tasks;
 
     public TaskList() {
-        tasks = new LinkedList<>();
+        tasks = new HashMap<>();
     }
 
-    public void add(Task task) {
-        tasks.add(task);
+    public void add(String taskListName, Task task) {
+        if(!tasks.containsKey(taskListName)) tasks.put(taskListName, new LinkedList<>());
+        tasks.get(taskListName).add(task);
     }
 
-    public void add(String title) {
-        tasks.add(new Task(title));
+    public void add(String taskListName, String title) {
+        add(taskListName, new Task(title));
     }
 
-    public void remove(Task task) {
-        tasks.remove(task);
-    }
-
-    public boolean remove(int id) {
+    public boolean remove(String taskListName, int id) {
         try {
-            tasks.remove(id);
+            tasks.get(taskListName).remove(id);
             return true;
         } catch(IndexOutOfBoundsException e) {
             return false;
         }
     }
 
-    public Task get(int id) {
+    public Task get(String taskListName, int id) {
         try {
-            return tasks.get(id);
+            return tasks.get(taskListName).get(id);
         } catch(IndexOutOfBoundsException e) {
             return null;
         }
@@ -55,27 +54,71 @@ public class TaskList implements Iterable<Task>, Serialize {
 
     @Override
     public Iterator<Task> iterator() {
-        if(tasks == null) return null;
-        return tasks.iterator();
+        return new It();
     }
 
     @Override
     public String toString() {
-        int lengthMax = (int) (Math.log10(tasks.size()) + 1);
+        if(tasks.isEmpty()) return "No tasks";
+        int totalSize = tasks.values().stream().mapToInt(LinkedList::size).sum();
+        int lengthMax = (int) (Math.log10(totalSize) + 1);
         String format = "%" + lengthMax + "d";
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < tasks.size(); i++) {
-            Task task = tasks.get(i);
-            sb.append(String.format(format, i))
-                    .append(": ")
-                    .append((task.isDone() ? "[X] " : "[ ] "))
-                    .append(task.getTitle())
-                    .append("\n");
+        for(String taskListName: tasks.keySet()) {
+            sb.append(taskListName).append(":\n");
+            LinkedList<Task> taskList = tasks.get(taskListName);
+            if(taskList.isEmpty()) sb.append("\tNo tasks\n");
+            else for(int i = 0; i < taskList.size(); i++) {
+                Task task = taskList.get(i);
+                sb.append(String.format(format, i))
+                  .append(": ")
+                  .append((task.isDone() ? "[X] " : "[ ] "))
+                  .append(task.getTitle())
+                  .append("\n");
+            }
+            sb.append("\n");
         }
         return sb.toString();
     }
 
     public int size() {
         return tasks.size();
+    }
+
+    public void addAll(TaskList other) {
+        for(String taskListName: other.tasks.keySet()) {
+            for(Task task: other.tasks.get(taskListName)) {
+                if(task.getTitle() == null || task.getTitle().isEmpty()) continue;
+                add(taskListName, new Task(
+                        task.getTitle(),
+                        task.getAdded() == null ? new Date() : task.getAdded(),
+                        task.isDone()
+                ));
+            }
+        }
+    }
+
+    private class It implements Iterator<Task> {
+        private final Iterator<String> taskListNameIterator;
+        private Iterator<Task> taskIterator;
+
+        public It() {
+            taskListNameIterator = tasks.keySet().iterator();
+            if(taskListNameIterator.hasNext())
+                taskIterator = tasks.get(taskListNameIterator.next()).iterator();
+            else taskIterator = null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return taskIterator != null && taskIterator.hasNext() || taskListNameIterator.hasNext();
+        }
+
+        @Override
+        public Task next() {
+            if(taskIterator == null || !taskIterator.hasNext()) taskIterator = tasks.get(
+                    taskListNameIterator.next()).iterator();
+            return taskIterator.next();
+        }
     }
 }
