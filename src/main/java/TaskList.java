@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.function.Predicate;
 
 public class TaskList implements Iterable<Task>, Serialize {
     private HashMap<String, LinkedList<Task>> tasks;
@@ -57,28 +58,38 @@ public class TaskList implements Iterable<Task>, Serialize {
         return new It();
     }
 
-    @Override
-    public String toString() {
-        if(tasks.isEmpty()) return "No tasks";
+    public String toString(Predicate<Task> taskPredicate) {
+        if(tasks.isEmpty()) return "No task list.";
+
         int totalSize = tasks.values().stream().mapToInt(LinkedList::size).sum();
         int lengthMax = (int) (Math.log10(totalSize) + 1);
         String format = "%" + lengthMax + "d";
+
         StringBuilder sb = new StringBuilder();
         for(String taskListName: tasks.keySet()) {
-            sb.append(taskListName).append(":\n");
             LinkedList<Task> taskList = tasks.get(taskListName);
-            if(taskList.isEmpty()) sb.append("\tNo tasks\n");
-            else for(int i = 0; i < taskList.size(); i++) {
-                Task task = taskList.get(i);
+            sb.append(taskListName).append(":\n");
+
+            int i = 0;
+            for(Task task: taskList) {
+                if(!taskPredicate.test(task)) continue;
+
                 sb.append(String.format(format, i))
                   .append(": ")
                   .append((task.isDone() ? "[X] " : "[ ] "))
                   .append(task.getTitle())
                   .append("\n");
+                ++i;
             }
+            if(i == 0) sb.append("No tasks\n");
             sb.append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return toString(t -> true);
     }
 
     public int size() {
