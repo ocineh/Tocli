@@ -1,4 +1,9 @@
+package cli;
+
 import com.google.gson.stream.JsonReader;
+import models.Serialize;
+import models.Task;
+import models.TaskList;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.CommandSpec;
