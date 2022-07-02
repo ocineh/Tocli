@@ -10,10 +10,15 @@ import java.util.LinkedList;
 import java.util.function.Predicate;
 
 public class TaskList implements Iterable<Task>, Serialize {
+    private static final TaskList instance = new TaskList();
     private HashMap<String, LinkedList<Task>> tasks;
 
-    public TaskList() {
+    private TaskList() {
         tasks = new HashMap<>();
+    }
+
+    public static TaskList getInstance() {
+        return instance;
     }
 
     public void add(String taskListName, Task task) {
