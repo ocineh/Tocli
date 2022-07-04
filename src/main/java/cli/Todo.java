@@ -1,9 +1,9 @@
 package cli;
 
 import com.google.gson.stream.JsonReader;
+import models.Data;
 import models.Serialize;
 import models.Task;
-import models.TaskList;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.CommandSpec;
@@ -13,21 +13,22 @@ import java.nio.file.Path;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
-@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.3")
+@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.4")
 public class Todo implements Callable<Integer> {
     @Option(
             names = {"--file", "-f"},
             description = "Path to the todo file (default: ${DEFAULT-VALUE})"
-    ) private final Path data = Path.of(".tasks");
+    ) private final Path dataFile = Path.of(".tasks");
+    private final Data data = new Data();
     @Spec CommandSpec spec;
     @Parameters(
-            paramLabel = "<TASK LIST NAME>",
-            description = "The name of the task list (default: ${DEFAULT-VALUE})",
+            paramLabel = "<TODO LIST NAME>",
+            description = "The name of the todo list (default: ${DEFAULT-VALUE})",
             defaultValue = "default"
-    ) private String taskListName;
+    ) private String todoListName;
 
     {
-        TaskList.getInstance().load(data);
+        data.load(dataFile);
     }
 
     public static void main(String[] args) {
@@ -54,20 +55,23 @@ public class Todo implements Callable<Integer> {
                     paramLabel = "<DATE>"
             ) Date addedAfter
     ) {
-        System.out.println(TaskList.getInstance().toString(task -> {
-            return (!undoneOnly || !task.isDone()) && (!doneOnly || task.isDone()) &&
-                    (titleRegex == null || task.getTitle().matches(titleRegex)) &&
-                    (addedBefore == null || !task.getAdded().after(addedBefore)) &&
-                    (addedAfter == null || !task.getAdded().before(addedAfter));
-        }));
+        System.out.println(todoListName + ":");
+        System.out.println("--title=" + titleRegex);
+        System.out.println(data.get(todoListName).toString(
+                task -> (!undoneOnly || !task.isDone()) && (!doneOnly || task.isDone()) &&
+                        (titleRegex == null || task.getTitle().matches(titleRegex)) &&
+                        (addedBefore == null || !task.getAdded().after(addedBefore)) &&
+                        (addedAfter == null || !task.getAdded().before(addedAfter))
+        ));
     }
 
     @Command(name = "add", description = "Add a new task", mixinStandardHelpOptions = true)
     public void add(
             @Parameters(paramLabel = "<TITLE>", description = "The title of the task") String title
     ) {
-        TaskList.getInstance().add(taskListName, title);
-        TaskList.getInstance().save(data);
+        data.get(todoListName).add(title);
+        System.out.println("Added task: " + title);
+        save();
     }
 
     @Command(name = "rename", description = "Rename a task", mixinStandardHelpOptions = true)
@@ -78,7 +82,7 @@ public class Todo implements Callable<Integer> {
                     description = "The new title of the task"
             ) String title
     ) {
-        Task task = TaskList.getInstance().get(taskListName, id);
+        Task task = data.get(todoListName).get(id);
         if(task == null) throw new ParameterException(
                 spec.commandLine(),
                 "No task exists with this id."
@@ -89,24 +93,25 @@ public class Todo implements Callable<Integer> {
                     "The new task title cannot be empty or contain only spaces."
             );
         task.setTitle(title);
-        TaskList.getInstance().save(data);
+        save();
     }
 
     @Command(name = "delete", description = "Delete a task", mixinStandardHelpOptions = true)
     public void delete(
             @Parameters(paramLabel = "<ID>", description = "The ID of the task") int id
     ) {
-        if(!TaskList.getInstance().remove(taskListName, id))
+        if(!data.get(todoListName).remove(id))
             throw new ParameterException(spec.commandLine(), "No task exists with this id.");
-        TaskList.getInstance().save(data);
+        save();
     }
 
     @Command(name = "done", description = "Mark a task as done", mixinStandardHelpOptions = true)
     public void done(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
     throws ParameterException {
-        Task task = TaskList.getInstance().get(taskListName, id);
+        Task task = data.get(todoListName).get(id);
         if(task != null) task.done();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        save();
     }
 
     @Command(
@@ -116,9 +121,10 @@ public class Todo implements Callable<Integer> {
     )
     public void undone(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
     throws ParameterException {
-        Task task = TaskList.getInstance().get(taskListName, id);
+        Task task = data.get(todoListName).get(id);
         if(task != null) task.undone();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
+        save();
     }
 
     @Command(
@@ -129,7 +135,7 @@ public class Todo implements Callable<Integer> {
     public void exportTasks(
             @Option(
                     names = {"-o", "--output"},
-                    description = "The path of the file where to export the tasks (default: in the terminal)"
+                    description = "The path of the file where to esxport the tasks (default: in the terminal)"
             ) Path file,
             @Option(
                     names = {"--pretty", "-p"},
@@ -147,7 +153,7 @@ public class Todo implements Callable<Integer> {
         }
 
         try {
-            String json = Serialize.toJson(TaskList.getInstance(), pretty);
+            String json = Serialize.toJson(data, pretty);
             writer.write(json);
             writer.flush();
             writer.close();
@@ -172,11 +178,21 @@ public class Todo implements Callable<Integer> {
     ) {
         try {
             JsonReader reader = new JsonReader(new FileReader(path.toFile()));
-            TaskList.getInstance().addAll(Serialize.fromJson(reader, TaskList.class));
+            this.data.merge(Serialize.fromJson(reader, Data.class));
+            save();
         } catch(FileNotFoundException e) {
             throw new ParameterException(spec.commandLine(), "The input file does not exist.");
-        } finally {
-            TaskList.getInstance().save(data);
+        }
+    }
+
+    private void save() {
+        try {
+            data.save(dataFile);
+        } catch(IOException e) {
+            throw new ParameterException(
+                    spec.commandLine(),
+                    "Error while writing into the data file."
+            );
         }
     }
 

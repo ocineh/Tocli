@@ -3,10 +3,10 @@ plugins {
     id 'application'
 }
 
-application.getMainClass().set("Todo")
+application.getMainClass().set("cli.Todo")
 
 group 'me.hocine'
-version '0.1.3'
+version '0.1.4'
 
 repositories {
     mavenCentral()
