@@ -10,10 +10,14 @@ import picocli.CommandLine.Model.CommandSpec;
 
 import java.io.*;
 import java.nio.file.Path;
-import java.util.Date;
 import java.util.concurrent.Callable;
 
-@Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.4")
+@Command(
+        name = "tocli",
+        mixinStandardHelpOptions = true,
+        version = "tocli 0.1.4",
+        subcommands = {List.class}
+)
 public class Tocli implements Callable<Integer> {
     @Option(
             names = {"--file", "-f"},
@@ -35,33 +39,12 @@ public class Tocli implements Callable<Integer> {
         System.exit(new CommandLine(new Tocli()).execute(args));
     }
 
-    @Command(name = "list", description = "List all tasks", mixinStandardHelpOptions = true)
-    public void list(
-            @Option(names = "--undone", description = "List only undone tasks") boolean undoneOnly,
-            @Option(names = "--done", description = "List only done tasks") boolean doneOnly,
-            @Option(
-                    names = "--title",
-                    description = "List only tasks whose title matches the given regex",
-                    paramLabel = "<REGEX>"
-            ) String titleRegex,
-            @Option(
-                    names = "--added-before",
-                    description = "List only tasks added before the given date (format: yyyy-MM-dd)",
-                    paramLabel = "<DATE>"
-            ) Date addedBefore,
-            @Option(
-                    names = "--added-after",
-                    description = "List only tasks added after the given date (format: yyyy-MM-dd)",
-                    paramLabel = "<DATE>"
-            ) Date addedAfter
-    ) {
-        System.out.println(todoListName + ":");
-        System.out.println(data.get(todoListName).toString(
-                task -> (!undoneOnly || !task.isDone()) && (!doneOnly || task.isDone()) &&
-                        (titleRegex == null || task.getTitle().matches(titleRegex)) &&
-                        (addedBefore == null || !task.getAdded().after(addedBefore)) &&
-                        (addedAfter == null || !task.getAdded().before(addedAfter))
-        ));
+    public Data getData() {
+        return data;
+    }
+
+    public String getTodoListName() {
+        return todoListName;
     }
 
     @Command(name = "add", description = "Add a new task", mixinStandardHelpOptions = true)
@@ -197,7 +180,6 @@ public class Tocli implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        list(false, false, null, null, null);
-        return 0;
+        return new CommandLine(new Tocli()).execute("--help");
     }
 }
