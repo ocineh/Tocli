@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.concurrent.Callable;
 
 @Command(name = "tocli", mixinStandardHelpOptions = true, version = "tocli 0.1.4")
-public class Todo implements Callable<Integer> {
+public class Tocli implements Callable<Integer> {
     @Option(
             names = {"--file", "-f"},
             description = "Path to the todo file (default: ${DEFAULT-VALUE})"
@@ -32,7 +32,7 @@ public class Todo implements Callable<Integer> {
     }
 
     public static void main(String[] args) {
-        System.exit(new CommandLine(new Todo()).execute(args));
+        System.exit(new CommandLine(new Tocli()).execute(args));
     }
 
     @Command(name = "list", description = "List all tasks", mixinStandardHelpOptions = true)
@@ -56,7 +56,6 @@ public class Todo implements Callable<Integer> {
             ) Date addedAfter
     ) {
         System.out.println(todoListName + ":");
-        System.out.println("--title=" + titleRegex);
         System.out.println(data.get(todoListName).toString(
                 task -> (!undoneOnly || !task.isDone()) && (!doneOnly || task.isDone()) &&
                         (titleRegex == null || task.getTitle().matches(titleRegex)) &&
