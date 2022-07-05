@@ -1,14 +1,12 @@
 package cli;
 
-import com.google.gson.stream.JsonReader;
 import models.Data;
-import models.Serialize;
 import models.Task;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.CommandSpec;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
@@ -16,7 +14,14 @@ import java.util.concurrent.Callable;
         name = "tocli",
         mixinStandardHelpOptions = true,
         version = "tocli 0.1.5",
-        subcommands = {List.class, Add.class, Rename.class, Delete.class, Export.class}
+        subcommands = {
+                List.class,
+                Add.class,
+                Rename.class,
+                Delete.class,
+                Export.class,
+                Import.class
+        }
 )
 public class Tocli implements Callable<Integer> {
     @Option(
@@ -67,26 +72,6 @@ public class Tocli implements Callable<Integer> {
         if(task != null) task.undone();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
         save();
-    }
-
-    @Command(
-            name = "import",
-            description = "Import tasks from a file in JSON format",
-            mixinStandardHelpOptions = true
-    )
-    public void importTasks(
-            @Parameters(
-                    paramLabel = "<INPUT>",
-                    description = "The path of the file from where to import the tasks"
-            ) Path path
-    ) {
-        try {
-            JsonReader reader = new JsonReader(new FileReader(path.toFile()));
-            this.data.merge(Serialize.fromJson(reader, Data.class));
-            save();
-        } catch(FileNotFoundException e) {
-            throw new ParameterException(spec.commandLine(), "The input file does not exist.");
-        }
     }
 
     void save() {
