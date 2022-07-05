@@ -15,7 +15,7 @@ import java.util.concurrent.Callable;
 @Command(
         name = "tocli",
         mixinStandardHelpOptions = true,
-        version = "tocli 0.1.4",
+        version = "tocli 0.1.5",
         subcommands = {List.class}
 )
 public class Tocli implements Callable<Integer> {
@@ -167,7 +167,7 @@ public class Tocli implements Callable<Integer> {
         }
     }
 
-    private void save() {
+    void save() {
         try {
             data.save(dataFile);
         } catch(IOException e) {
