@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
         name = "tocli",
         mixinStandardHelpOptions = true,
         version = "tocli 0.1.5",
-        subcommands = {List.class, Add.class}
+        subcommands = {List.class, Add.class, Rename.class}
 )
 public class Tocli implements Callable<Integer> {
     @Option(
@@ -45,28 +45,6 @@ public class Tocli implements Callable<Integer> {
 
     public String getTodoListName() {
         return todoListName;
-    }
-
-    @Command(name = "rename", description = "Rename a task", mixinStandardHelpOptions = true)
-    public void rename(
-            @Parameters(paramLabel = "<ID>", description = "The ID of the task") int id,
-            @Parameters(
-                    paramLabel = "<TITLE>",
-                    description = "The new title of the task"
-            ) String title
-    ) {
-        Task task = data.get(todoListName).get(id);
-        if(task == null) throw new ParameterException(
-                spec.commandLine(),
-                "No task exists with this id."
-        );
-        if(title == null || title.isEmpty() || title.isBlank())
-            throw new ParameterException(
-                    spec.commandLine(),
-                    "The new task title cannot be empty or contain only spaces."
-            );
-        task.setTitle(title);
-        save();
     }
 
     @Command(name = "delete", description = "Delete a task", mixinStandardHelpOptions = true)
