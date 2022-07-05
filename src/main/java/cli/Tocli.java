@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
         name = "tocli",
         mixinStandardHelpOptions = true,
         version = "tocli 0.1.5",
-        subcommands = {List.class, Add.class, Rename.class}
+        subcommands = {List.class, Add.class, Rename.class, Delete.class}
 )
 public class Tocli implements Callable<Integer> {
     @Option(
@@ -45,15 +45,6 @@ public class Tocli implements Callable<Integer> {
 
     public String getTodoListName() {
         return todoListName;
-    }
-
-    @Command(name = "delete", description = "Delete a task", mixinStandardHelpOptions = true)
-    public void delete(
-            @Parameters(paramLabel = "<ID>", description = "The ID of the task") int id
-    ) {
-        if(!data.get(todoListName).remove(id))
-            throw new ParameterException(spec.commandLine(), "No task exists with this id.");
-        save();
     }
 
     @Command(name = "done", description = "Mark a task as done", mixinStandardHelpOptions = true)
