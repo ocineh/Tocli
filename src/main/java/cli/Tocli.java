@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
         name = "tocli",
         mixinStandardHelpOptions = true,
         version = "tocli 0.1.5",
-        subcommands = {List.class}
+        subcommands = {List.class, Add.class}
 )
 public class Tocli implements Callable<Integer> {
     @Option(
@@ -45,15 +45,6 @@ public class Tocli implements Callable<Integer> {
 
     public String getTodoListName() {
         return todoListName;
-    }
-
-    @Command(name = "add", description = "Add a new task", mixinStandardHelpOptions = true)
-    public void add(
-            @Parameters(paramLabel = "<TITLE>", description = "The title of the task") String title
-    ) {
-        data.get(todoListName).add(title);
-        System.out.println("Added task: " + title);
-        save();
     }
 
     @Command(name = "rename", description = "Rename a task", mixinStandardHelpOptions = true)
