@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
         name = "tocli",
         mixinStandardHelpOptions = true,
         version = "tocli 0.1.5",
-        subcommands = {List.class, Add.class, Rename.class, Delete.class}
+        subcommands = {List.class, Add.class, Rename.class, Delete.class, Export.class}
 )
 public class Tocli implements Callable<Integer> {
     @Option(
@@ -67,44 +67,6 @@ public class Tocli implements Callable<Integer> {
         if(task != null) task.undone();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
         save();
-    }
-
-    @Command(
-            name = "export",
-            description = "Export the tasks to a file (if specified) in JSON format",
-            mixinStandardHelpOptions = true
-    )
-    public void exportTasks(
-            @Option(
-                    names = {"-o", "--output"},
-                    description = "The path of the file where to esxport the tasks (default: in the terminal)"
-            ) Path file,
-            @Option(
-                    names = {"--pretty", "-p"},
-                    description = "Pretty print the JSON file (default: ${DEFAULT-VALUE})"
-            ) boolean pretty
-    ) {
-        Writer writer;
-        if(file == null) writer = new OutputStreamWriter(System.out);
-        else {
-            try {
-                writer = new FileWriter(file.toFile());
-            } catch(IOException ignored) {
-                throw new ParameterException(spec.commandLine(), "Could not open output file.");
-            }
-        }
-
-        try {
-            String json = Serialize.toJson(data, pretty);
-            writer.write(json);
-            writer.flush();
-            writer.close();
-        } catch(IOException e) {
-            throw new ParameterException(
-                    spec.commandLine(),
-                    "Error while writing into the output file."
-            );
-        }
     }
 
     @Command(
