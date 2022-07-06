@@ -31,15 +31,12 @@ public class Tocli implements Callable<Integer> {
     ) private final Path dataFile = Path.of(".tasks");
     private final Data data = new Data();
     @Spec CommandSpec spec;
+    private boolean loaded = false;
     @Parameters(
             paramLabel = "<TODO LIST NAME>",
             description = "The name of the todo list (default: ${DEFAULT-VALUE})",
             defaultValue = "default"
     ) private String todoListName;
-
-    {
-        data.load(dataFile);
-    }
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new Tocli())
@@ -48,6 +45,7 @@ public class Tocli implements Callable<Integer> {
     }
 
     public Data getData() {
+        if(!loaded) load();
         return data;
     }
 
@@ -62,6 +60,18 @@ public class Tocli implements Callable<Integer> {
             throw new ParameterException(
                     spec.commandLine(),
                     "Error while writing into the data file."
+            );
+        }
+    }
+
+    void load() {
+        try {
+            data.load(dataFile);
+            loaded = true;
+        } catch(IOException e) {
+            throw new ParameterException(
+                    spec.commandLine(),
+                    "Error while reading from the data file."
             );
         }
     }

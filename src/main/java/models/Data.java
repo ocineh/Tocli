@@ -2,6 +2,7 @@ package models;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.HashMap;
 
@@ -29,12 +30,12 @@ public class Data implements Serialize {
         }
     }
 
-    public void load(Path path) {
+    public void load(Path path) throws IOException {
         try {
             String content = Files.readString(path);
             Data data = Serialize.fromBase64(content);
             merge(data);
-        } catch(IOException | ClassNotFoundException ignored) {}
+        } catch(NoSuchFileException | ClassNotFoundException ignored) {}
     }
 
     public void save(Path path) throws IOException {
