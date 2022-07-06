@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 @Command(
         name = "tocli",
         mixinStandardHelpOptions = true,
-        version = "tocli 0.1.5",
+        version = "tocli 0.1.6",
         subcommands = {
                 List.class,
                 Add.class,
@@ -42,7 +42,9 @@ public class Tocli implements Callable<Integer> {
     }
 
     public static void main(String[] args) {
-        System.exit(new CommandLine(new Tocli()).execute(args));
+        System.exit(new CommandLine(new Tocli())
+                            .setCaseInsensitiveEnumValuesAllowed(true)
+                            .execute(args));
     }
 
     public Data getData() {
@@ -66,7 +68,8 @@ public class Tocli implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        return new CommandLine(new Tocli()).execute("--help");
+        main(new String[]{"--help"});
+        return 0;
     }
 
     public CommandSpec getSpec() {
