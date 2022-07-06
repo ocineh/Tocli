@@ -20,7 +20,8 @@ import java.util.concurrent.Callable;
                 Rename.class,
                 Delete.class,
                 Export.class,
-                Import.class
+                Import.class,
+                Undone.class,
         }
 )
 public class Tocli implements Callable<Integer> {
@@ -57,19 +58,6 @@ public class Tocli implements Callable<Integer> {
     throws ParameterException {
         Task task = data.get(todoListName).get(id);
         if(task != null) task.done();
-        else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
-        save();
-    }
-
-    @Command(
-            name = "undone",
-            description = "Mark a task as undone",
-            mixinStandardHelpOptions = true
-    )
-    public void undone(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
-    throws ParameterException {
-        Task task = data.get(todoListName).get(id);
-        if(task != null) task.undone();
         else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
         save();
     }
