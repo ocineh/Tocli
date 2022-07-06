@@ -1,7 +1,6 @@
 package cli;
 
 import models.Data;
-import models.Task;
 import picocli.CommandLine;
 import picocli.CommandLine.*;
 import picocli.CommandLine.Model.CommandSpec;
@@ -22,6 +21,7 @@ import java.util.concurrent.Callable;
                 Export.class,
                 Import.class,
                 Undone.class,
+                Done.class
         }
 )
 public class Tocli implements Callable<Integer> {
@@ -51,15 +51,6 @@ public class Tocli implements Callable<Integer> {
 
     public String getTodoListName() {
         return todoListName;
-    }
-
-    @Command(name = "done", description = "Mark a task as done", mixinStandardHelpOptions = true)
-    public void done(@Parameters(paramLabel = "<ID>", description = "The ID of the task") int id)
-    throws ParameterException {
-        Task task = data.get(todoListName).get(id);
-        if(task != null) task.done();
-        else throw new ParameterException(spec.commandLine(), "No task exists with this id.");
-        save();
     }
 
     void save() {
