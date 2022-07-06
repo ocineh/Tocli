@@ -4,13 +4,12 @@ import models.Task;
 import models.TodoList;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import picocli.CommandLine.ParentCommand;
 
 import java.util.Comparator;
 import java.util.Date;
 
 @Command(name = "list", description = "List all tasks", mixinStandardHelpOptions = true)
-public class List implements Runnable {
+public class List extends SubCommand {
     @Option(names = "--undone", description = "List only undone tasks") private boolean undoneOnly;
     @Option(names = "--done", description = "List only done tasks") private boolean doneOnly;
     @Option(
@@ -37,14 +36,13 @@ public class List implements Runnable {
             names = "--reverse",
             description = "Reverse the order of the tasks"
     ) private boolean reverse;
-    @ParentCommand private Tocli tocli;
 
     @Override
     public void run() {
-        System.out.println(tocli.getTodoListName() + ":");
-        TodoList todoList = tocli.getData().get(tocli.getTodoListName());
+        System.out.println(getTodoListName() + ":");
+        TodoList todoList = getData().get(getTodoListName());
         if(sortType != null) todoList.sort(sortType.getComparator(reverse));
-        tocli.save();
+        save();
         System.out.println(todoList.toString(task -> {
             return (!undoneOnly || !task.isDone()) && (!doneOnly || task.isDone()) &&
                     (titleRegex == null || task.getTitle().matches(titleRegex)) &&

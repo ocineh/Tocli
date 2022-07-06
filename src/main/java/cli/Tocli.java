@@ -68,4 +68,8 @@ public class Tocli implements Callable<Integer> {
     public Integer call() {
         return new CommandLine(new Tocli()).execute("--help");
     }
+
+    public CommandSpec getSpec() {
+        return spec;
+    }
 }
