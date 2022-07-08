@@ -8,6 +8,13 @@ import picocli.CommandLine.ParentCommand;
 public abstract class SubCommand implements Runnable {
     private @ParentCommand Tocli tocli;
 
+    public SubCommand() {
+    }
+
+    public SubCommand(Tocli tocli) {
+        this.tocli = tocli;
+    }
+
     public Model.CommandSpec getSpec() {
         return tocli.getSpec();
     }

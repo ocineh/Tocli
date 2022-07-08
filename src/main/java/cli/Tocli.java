@@ -12,16 +12,14 @@ import java.util.concurrent.Callable;
 @Command(
         name = "tocli",
         mixinStandardHelpOptions = true,
-        version = "tocli 0.1.6",
+        version = "tocli 0.2.0",
         subcommands = {
                 List.class,
                 Add.class,
-                Rename.class,
                 Delete.class,
                 Export.class,
                 Import.class,
-                Undone.class,
-                Done.class
+                Edit.class,
         }
 )
 public class Tocli implements Callable<Integer> {
@@ -74,6 +72,52 @@ public class Tocli implements Callable<Integer> {
                     "Error while reading from the data file."
             );
         }
+    }
+
+    @Command(
+            name = "done",
+            description = "Mark a task as done.",
+            mixinStandardHelpOptions = true
+    )
+    public void done(
+            @Parameters(
+                    paramLabel = "<ID>",
+                    description = "The ID of the task."
+            ) int id
+    ) {
+        new Edit(this, id, null, null, true, false).run();
+    }
+
+    @Command(
+            name = "undone",
+            description = "Mark a task as undone.",
+            mixinStandardHelpOptions = true
+    )
+    public void undone(
+            @Parameters(
+                    paramLabel = "<ID>",
+                    description = "The ID of the task."
+            ) int id
+    ) {
+        new Edit(this, id, null, null, false, true).run();
+    }
+
+    @Command(
+            name = "rename",
+            description = "Rename a task.",
+            mixinStandardHelpOptions = true
+    )
+    public void rename(
+            @Parameters(
+                    paramLabel = "<ID>",
+                    description = "The ID of the task."
+            ) int id,
+            @Parameters(
+                    paramLabel = "<TITLE>",
+                    description = "The new title of the task."
+            ) String title
+    ) {
+        new Edit(this, id, title, null, false, false).run();
     }
 
     @Override
