@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.function.Predicate;
@@ -14,6 +15,10 @@ public class TodoList implements Iterable<Task>, Serialize {
 
     public void add(Task task) {
         tasks.add(task);
+    }
+
+    public void add(String title, Date dueDate) {
+        add(new Task(title, dueDate));
     }
 
     public void add(String title) {
