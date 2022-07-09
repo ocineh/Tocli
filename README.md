@@ -6,14 +6,20 @@ A simple command line interface to manage your todo list.
 
 - [x] Add a task
 - [x] Delete a task
-- [ ] List the tasks
+- [x] List the tasks
   - [x] Filter by status (undone or done)
   - [x] Filter by creation date (after or before)
   - [x] Filter by title with a regex
-  - [ ] Filter by todo list
+  - [x] Filter by todo list
   - [x] Sort by creation date (ascending or descending)
   - [x] Sort by alphabetical order (ascending or descending)
   - [x] Sort by status (undone or done)
+- [ ] Edit a task
+  - [x] Edit the title
+  - [x] Edit the description
+  - [x] Edit the status (undone or done)
+  - [x] Edit the due date
+  - [ ] Edit the todo list where the task is
 - [x] Rename a task
 - [x] Mark a task as done
 - [x] Mark a task as not done
@@ -46,6 +52,7 @@ gradle run --args="-h"
 ```bash
 tocli add "Buy milk" # Add a task to the default todo list
 tocli groceries add "Buy milk" # Add a task to the groceries todo list
+tocli add "Buy mild" --due "22/12/2018" # Add a task with a due date
 ```
 
 ### Delete a task
@@ -64,6 +71,16 @@ tocli list --undone # List all the undone tasks
 tocli list --added-before "2020-01-01" # List all the tasks added before 2020-01-01
 tocli list --added-after "2020-01-01" # List all the tasks added after 2020-01-01
 tocli list --title "^Buy.*" # List all the tasks with the title starting with "Buy"
+```
+
+### Edit a task
+
+```bash
+tocli edit 0 --title "Buy milk" # Edit the title of a task
+tocli groceries edit 0 --title "Buy milk" # Edit the title of a task in the groceries todo list
+tocli edit 0 --due "2020-01-01" # Edit the due date of a task
+tocli edit 0 --done # Mark the task as done
+tocli edit 0 --undone # Mark the task as not done
 ```
 
 ### Rename a task
