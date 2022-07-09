@@ -11,9 +11,9 @@ A simple command line interface to manage your todo list.
   - [x] Filter by creation date (after or before)
   - [x] Filter by title with a regex
   - [ ] Filter by todo list
-  - [ ] Sort by creation date (ascending or descending)
-  - [ ] Sort by alphabetical order (ascending or descending)
-  - [ ] Sort by status (undone or done)
+  - [x] Sort by creation date (ascending or descending)
+  - [x] Sort by alphabetical order (ascending or descending)
+  - [x] Sort by status (undone or done)
 - [x] Rename a task
 - [x] Mark a task as done
 - [x] Mark a task as not done
@@ -95,6 +95,6 @@ tocli import tasks.json # Import the tasks from tasks.json
 
 ## License
 
-Not licensed yet.
+GNU General Public License v3.0 or later
 
-[//]: # (TODO: add a license)
+See **COPYING** to see the full text.
